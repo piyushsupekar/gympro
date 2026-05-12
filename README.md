@@ -43,6 +43,9 @@ are not configured.
 See `docs/monetization.md` for the full no-ads business model, revenue streams,
 and year-one estimate.
 
+See `docs/firebase_setup.md` for Firebase project setup, Firestore rules, and the
+Google Play Store launch checklist.
+
 ## GitHub
 
 The local repository has an initial `main` commit and active development happens on

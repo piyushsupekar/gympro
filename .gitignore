@@ -15,7 +15,6 @@ pubspec.lock
 android/app/google-services.json
 ios/Runner/GoogleService-Info.plist
 macos/Runner/GoogleService-Info.plist
-firebase_options.dart
 
 # OS
 .DS_Store

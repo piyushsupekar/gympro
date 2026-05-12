@@ -2,6 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'firebase_options.dart';
 import 'src/app.dart';
 import 'src/providers/auth_provider.dart';
 import 'src/providers/onboarding_provider.dart';
@@ -17,7 +18,9 @@ Future<void> main() async {
 
   Object? firebaseError;
   try {
-    await Firebase.initializeApp();
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
   } catch (error) {
     firebaseError = error;
   }

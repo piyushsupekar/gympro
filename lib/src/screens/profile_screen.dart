@@ -161,7 +161,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     const Divider(height: 1),
                     ListTile(
                       leading: const Icon(Icons.ios_share, color: AppTheme.accent),
-                      title: const Text('Export data'),
+                      title: const Text('CSV/PDF export'),
                       subtitle: const Text('Pro members can export workout history'),
                       onTap: () {
                         if (!subscription.isPro) {
@@ -170,6 +170,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         }
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(content: Text('Prepared ${workouts.length} workouts for export.')),
+                        );
+                      },
+                    ),
+                    const Divider(height: 1),
+                    ListTile(
+                      leading: const Icon(Icons.auto_awesome, color: AppTheme.accent),
+                      title: const Text('AI workout plans'),
+                      subtitle: const Text('Included with Pro'),
+                      onTap: () {
+                        if (!subscription.isPro) {
+                          UpgradePrompt.show(context);
+                          return;
+                        }
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('AI workout plans module is ready for your training preferences.')),
                         );
                       },
                     ),

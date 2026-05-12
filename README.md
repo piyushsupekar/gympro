@@ -40,6 +40,9 @@ Create products in Play Console/App Store Connect with these IDs:
 The app shows fallback prices of `₹199/month` and `₹999/year` while store products
 are not configured.
 
+See `docs/monetization.md` for the full no-ads business model, revenue streams,
+and year-one estimate.
+
 ## GitHub
 
 The local repository has an initial `main` commit and active development happens on

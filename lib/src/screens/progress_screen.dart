@@ -8,6 +8,7 @@ import '../providers/subscription_provider.dart';
 import '../providers/workout_provider.dart';
 import '../theme/app_theme.dart';
 import '../widgets/empty_state.dart';
+import '../widgets/stat_tile.dart';
 import '../widgets/upgrade_prompt.dart';
 
 class ProgressScreen extends StatelessWidget {
@@ -28,40 +29,94 @@ class ProgressScreen extends StatelessWidget {
               title: 'No progress yet',
               message: 'Finish workouts to unlock charts, frequency trends, and PR tracking.',
             )
-          : ListView(
-              padding: const EdgeInsets.all(16),
-              children: [
-                if (!isPro)
-                  Card(
-                    margin: const EdgeInsets.only(bottom: 14),
-                    child: ListTile(
-                      leading: const Icon(Icons.workspace_premium, color: AppTheme.accent),
-                      title: const Text('Advanced charts are Pro'),
-                      subtitle: const Text('Free users see basic trends only.'),
-                      trailing: TextButton(onPressed: () => UpgradePrompt.show(context), child: const Text('Upgrade')),
-                    ),
-                  ),
-                Text('Weight lifted over time', style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900)),
-                const SizedBox(height: 12),
-                SizedBox(height: 220, child: _VolumeLineChart(workouts: workouts)),
-                const SizedBox(height: 24),
-                Text('Workout frequency', style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900)),
-                const SizedBox(height: 12),
-                SizedBox(height: 220, child: _FrequencyChart(workouts: workouts)),
-                const SizedBox(height: 24),
-                Text('Personal records', style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900)),
-                const SizedBox(height: 12),
-                ..._prs(workouts).map((record) => Card(
-                      margin: const EdgeInsets.only(bottom: 10),
-                      child: ListTile(
-                        leading: const Icon(Icons.emoji_events, color: AppTheme.accent),
-                        title: Text(record.name, style: const TextStyle(fontWeight: FontWeight.w800)),
-                        subtitle: Text(DateFormat.yMMMd().format(record.date)),
-                        trailing: Text('${record.weight.toStringAsFixed(0)} kg x ${record.reps}'),
-                      ),
-                    )),
-              ],
-            ),
+          : !isPro
+              ? _FreeProgressSummary(workouts: workouts)
+              : ListView(
+                  padding: const EdgeInsets.all(16),
+                  children: [
+                    Text('Weight lifted over time', style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900)),
+                    const SizedBox(height: 12),
+                    SizedBox(height: 220, child: _VolumeLineChart(workouts: workouts)),
+                    const SizedBox(height: 24),
+                    Text('Workout frequency', style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900)),
+                    const SizedBox(height: 12),
+                    SizedBox(height: 220, child: _FrequencyChart(workouts: workouts)),
+                    const SizedBox(height: 24),
+                    Text('Personal records', style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900)),
+                    const SizedBox(height: 12),
+                    ..._prs(workouts).map((record) => Card(
+                          margin: const EdgeInsets.only(bottom: 10),
+                          child: ListTile(
+                            leading: const Icon(Icons.emoji_events, color: AppTheme.accent),
+                            title: Text(record.name, style: const TextStyle(fontWeight: FontWeight.w800)),
+                            subtitle: Text(DateFormat.yMMMd().format(record.date)),
+                            trailing: Text('${record.weight.toStringAsFixed(0)} kg x ${record.reps}'),
+                          ),
+                        )),
+                  ],
+                ),
+    );
+  }
+}
+
+class _FreeProgressSummary extends StatelessWidget {
+  const _FreeProgressSummary({required this.workouts});
+
+  final List<Workout> workouts;
+
+  @override
+  Widget build(BuildContext context) {
+    final totalVolume = workouts.fold<double>(0, (sum, item) => sum + item.totalVolume);
+    final totalSets = workouts.fold<int>(0, (sum, item) => sum + item.totalSets);
+
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        Card(
+          margin: const EdgeInsets.only(bottom: 14),
+          child: ListTile(
+            leading: const Icon(Icons.workspace_premium, color: AppTheme.accent),
+            title: const Text('Advanced progress is Pro'),
+            subtitle: const Text('Unlock charts, PR insights, frequency trends, and exports. No ads.'),
+            trailing: TextButton(onPressed: () => UpgradePrompt.show(context), child: const Text('Upgrade')),
+          ),
+        ),
+        Row(
+          children: [
+            Expanded(child: StatTile(label: 'Workouts', value: workouts.length.toString(), icon: Icons.event_available)),
+            const SizedBox(width: 10),
+            Expanded(child: StatTile(label: 'Volume', value: totalVolume.toStringAsFixed(0), icon: Icons.monitor_weight)),
+            const SizedBox(width: 10),
+            Expanded(child: StatTile(label: 'Sets', value: totalSets.toString(), icon: Icons.repeat)),
+          ],
+        ),
+        const SizedBox(height: 18),
+        Text('Locked Pro tools', style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900)),
+        const SizedBox(height: 10),
+        const _LockedTool(icon: Icons.show_chart, title: 'Weight lifted over time'),
+        const _LockedTool(icon: Icons.bar_chart, title: 'Workout frequency chart'),
+        const _LockedTool(icon: Icons.emoji_events, title: 'Personal record list'),
+        const _LockedTool(icon: Icons.ios_share, title: 'CSV/PDF export'),
+      ],
+    );
+  }
+}
+
+class _LockedTool extends StatelessWidget {
+  const _LockedTool({required this.icon, required this.title});
+
+  final IconData icon;
+  final String title;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 10),
+      child: ListTile(
+        leading: Icon(icon, color: AppTheme.accent),
+        title: Text(title),
+        trailing: const Icon(Icons.lock),
+      ),
     );
   }
 }
